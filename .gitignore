@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Local databases & ML artifacts (never commit data/models)
+*.db
+backend/ml_artifacts/
+ml_artifacts/
+
+# Node
+node_modules/
+frontend/dist/
+
+# Env & secrets
+.env
+*.env.local
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
