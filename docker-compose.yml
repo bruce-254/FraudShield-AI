@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: fraudshield
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fraudshield_dev_pw}
+      POSTGRES_DB: fraudshield
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fraudshield"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      FRAUDSHIELD_DATABASE_URL: postgresql+psycopg2://fraudshield:${POSTGRES_PASSWORD:-fraudshield_dev_pw}@db:5432/fraudshield
+      FRAUDSHIELD_SECRET_KEY: ${FRAUDSHIELD_SECRET_KEY:?set a strong secret in .env}
+      FRAUDSHIELD_ENVIRONMENT: production
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ml_artifacts:/app/ml_artifacts
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  ml_artifacts:
